@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>NEXORA TV</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+        body{background:linear-gradient(135deg,#0a2f3a,#0a1a1f);padding:20px;}
+        .container{max-width:1200px;margin:0 auto;}
+        .home-mode{display:block;}
+        .player-mode{display:none;}
+        h1{color:#FFD700;text-align:center;margin-bottom:10px;font-size:1.8rem;}
+        .sub{text-align:center;color:#ddd;margin-bottom:25px;font-size:0.85rem;}
+        
+        /* ==================== ইভেন্ট ব্যানার (অত্যন্ত বেশি হাইলাইট) ==================== */
+        .event-banner{
+            background:linear-gradient(135deg,#ff416c,#ff4b2b);
+            border-radius:20px;
+            padding:18px 20px;
+            margin-bottom:30px;
+            text-align:center;
+            cursor:pointer;
+            transition:all 0.3s ease;
+            box-shadow:0 8px 20px rgba(0,0,0,0.3);
+            border:4px solid transparent;
+        }
+        .event-banner:hover{
+            transform:scale(1.1);
+            border-color:#FFD700;
+            box-shadow:0 0 70px rgba(255,215,0,0.7), 0 15px 50px rgba(0,0,0,0.5);
+        }
+        .event-banner:focus-visible{
+            transform:scale(1.1);
+            outline:6px solid #FFD700;
+            outline-offset:8px;
+            box-shadow:0 0 70px rgba(255,215,0,0.7), 0 15px 50px rgba(0,0,0,0.5);
+        }
+        .event-title{font-size:1.8rem;font-weight:bold;color:#fff;}
+        .event-desc{color:#fff9c4;margin-top:8px;font-size:1rem;}
+        .event-live{background:#ff0;color:#000;display:inline-block;padding:4px 12px;border-radius:40px;font-size:0.7rem;font-weight:bold;margin-top:8px;}
+        
+        /* ==================== ক্যাটাগরি বাটন ==================== */
+        .category-selector{
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            margin-bottom:25px;
+            justify-content:center;
+        }
+        .cat-btn{
+            background:rgba(255,255,255,0.15);
+            color:#ddd;
+            border:2px solid rgba(255,255,255,0.2);
+            padding:8px 20px;
+            border-radius:40px;
+            cursor:pointer;
+            font-weight:bold;
+            transition:all 0.3s ease;
+            font-size:0.9rem;
+        }
+        .cat-btn:hover{
+            background:rgba(255,215,0,0.4);
+            border-color:#FFD700;
+            color:#FFD700;
+            transform:scale(1.12);
+            box-shadow:0 0 40px rgba(255,215,0,0.4);
+        }
+        .cat-btn.active{
+            background:#FFD700;
+            color:#1a2f3a;
+            border-color:#FFD700;
+            box-shadow:0 0 45px rgba(255,215,0,0.6);
+        }
+        .cat-btn:focus-visible{
+            outline:4px solid #FFD700;
+            outline-offset:4px;
+            transform:scale(1.12);
+        }
+        
+        /* ==================== চ্যানেল গ্রিড ==================== */
+        .channels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:15px;margin-bottom:30px;}
+        
+        /* ==================== চ্যানেল কার্ড (অত্যন্ত বেশি হাইলাইট - দূর থেকে স্পষ্ট) ==================== */
+        .channel-card{
+            background:white;
+            border-radius:16px;
+            padding:15px;
+            text-align:center;
+            cursor:pointer;
+            transition:all 0.3s ease;
+            position:relative;
+            border:4px solid transparent;
+            box-shadow:0 4px 10px rgba(0,0,0,0.1);
+        }
+        /* হোভার ইফেক্ট (মাউস) */
+        .channel-card:hover{
+            transform:scale(1.25) translateY(-10px);
+            box-shadow:0 30px 70px rgba(0,0,0,0.85), 0 0 80px rgba(255,215,0,0.5);
+            border-color:#FFD700;
+            z-index:20;
+            background:#ffffff;
+        }
+        /* ফোকাস ইফেক্ট (টিভি রিমোট) - দূর থেকে স্পষ্ট */
+        .channel-card:focus-visible{
+            transform:scale(1.25) translateY(-10px);
+            outline:6px solid #FFD700;
+            outline-offset:15px;
+            box-shadow:0 30px 70px rgba(0,0,0,0.85), 0 0 80px rgba(255,215,0,0.6);
+            z-index:20;
+            background:#ffffff;
+        }
+        .channel-card:active{
+            transform:scale(0.95);
+        }
+        .channel-card img{
+            width:70px;
+            height:70px;
+            object-fit:contain;
+            border-radius:50%;
+            background:#f0f0f0;
+            padding:8px;
+            transition:all 0.3s ease;
+        }
+        .channel-card:hover img,
+        .channel-card:focus-visible img{
+            transform:scale(1.15);
+            box-shadow:0 0 40px rgba(255,215,0,0.5);
+        }
+        .channel-name{
+            font-weight:bold;
+            margin:8px 0;
+            color:#1a3f4a;
+            font-size:0.85rem;
+            transition:all 0.3s ease;
+        }
+        .channel-card:hover .channel-name,
+        .channel-card:focus-visible .channel-name{
+            color:#FFD700;
+            font-size:1.05rem;
+            text-shadow:0 0 30px rgba(255,215,0,0.4);
+        }
+        .channel-category{
+            font-size:0.65rem;
+            color:#888;
+            margin-top:3px;
+            transition:all 0.3s ease;
+        }
+        .channel-card:hover .channel-category,
+        .channel-card:focus-visible .channel-category{
+            color:#333;
+        }
+        .live-badge{
+            background:red;
+            color:white;
+            font-size:0.6rem;
+            padding:2px 8px;
+            border-radius:20px;
+            display:inline-block;
+            margin-top:4px;
+            animation:pulse 1.5s infinite;
+        }
+        .channel-card:hover .live-badge,
+        .channel-card:focus-visible .live-badge{
+            transform:scale(1.2);
+            box-shadow:0 0 20px rgba(255,0,0,0.5);
+        }
+        @keyframes pulse{
+            0%,100%{opacity:1;}
+            50%{opacity:0.3;}
+        }
+        
+        /* ==================== প্লেয়ার ==================== */
+        .player-area{background:#000;border-radius:16px;overflow:hidden;margin-bottom:10px;box-shadow:0 10px 25px rgba(0,0,0,0.3);position:relative;width:100%;}
+        .player-header{background:#1a1a1a;padding:12px 15px;color:#FFD700;font-weight:bold;font-size:0.95rem;border-bottom:1px solid #333;}
+        .video-wrapper{width:100%;background:#000;position:relative;display:flex;align-items:center;justify-content:center;aspect-ratio:16/9;min-height:50vh;max-height:85vh;overflow:hidden;}
+        video{width:100%;height:100%;background:#000;outline:none;display:block;object-fit:contain;}
+        .loading-text{color:#FFD700;font-size:1.2rem;text-align:center;padding:20px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+        .error-text{color:#ff4444;font-size:1rem;text-align:center;padding:20px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+        
+        /* ==================== সুজেশন ==================== */
+        .suggestions-section{margin:12px 0 20px;}
+        .suggestions-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+        .suggestions-header h3{color:#FFD700;font-size:1.0rem;display:flex;align-items:center;gap:6px;}
+        .home-back-btn{
+            background:rgba(255,215,0,0.2);
+            color:#FFD700;
+            border:2px solid #FFD700;
+            padding:6px 16px;
+            border-radius:40px;
+            cursor:pointer;
+            font-weight:bold;
+            font-size:0.8rem;
+            transition:all 0.3s ease;
+        }
+        .home-back-btn:hover{
+            background:#FFD700;
+            color:#1a2f3a;
+            transform:scale(1.12);
+            box-shadow:0 0 30px rgba(255,215,0,0.5);
+        }
+        .home-back-btn:focus-visible{
+            outline:4px solid #FFD700;
+            outline-offset:4px;
+            transform:scale(1.12);
+        }
+        
+        .suggestions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:15px;}
+        .suggestion-card{
+            background:rgba(255,255,255,0.95);
+            border-radius:16px;
+            padding:12px;
+            text-align:center;
+            cursor:pointer;
+            transition:all 0.3s ease;
+            border:4px solid transparent;
+        }
+        .suggestion-card:hover{
+            transform:scale(1.18);
+            box-shadow:0 25px 60px rgba(0,0,0,0.7), 0 0 50px rgba(255,215,0,0.35);
+            border-color:#FFD700;
+            z-index:10;
+        }
+        .suggestion-card:focus-visible{
+            transform:scale(1.18);
+            outline:5px solid #FFD700;
+            outline-offset:6px;
+            box-shadow:0 25px 60px rgba(0,0,0,0.7), 0 0 50px rgba(255,215,0,0.45);
+            z-index:10;
+        }
+        .suggestion-card img{width:60px;height:60px;object-fit:contain;border-radius:50%;background:#f0f0f0;padding:6px;transition:transform 0.3s;}
+        .suggestion-card:hover img,
+        .suggestion-card:focus-visible img{transform:scale(1.12);}
+        .suggestion-name{font-weight:bold;margin-top:8px;color:#1a3f4a;font-size:0.8rem;transition:color 0.3s;}
+        .suggestion-card:hover .suggestion-name,
+        .suggestion-card:focus-visible .suggestion-name{color:#FFD700;font-size:0.9rem;}
+        .live-badge-small{background:red;color:white;font-size:0.6rem;padding:2px 8px;border-radius:20px;display:inline-block;margin-top:5px;animation:pulse 1.5s infinite;}
+        
+        /* ==================== অ্যাড ==================== */
+        .ad-bottom{display:flex;justify-content:center;align-items:center;margin:20px 0 15px;min-height:100px;background:rgba(255,255,255,0.05);border-radius:12px;padding:10px;}
+        footer{text-align:center;color:#aaa;margin-top:20px;font-size:0.7rem;}
+        
+        /* ==================== টিভি / বড় স্ক্রিন (অত্যন্ত বেশি হাইলাইট - দূর থেকে স্পষ্ট) ==================== */
+        @media (min-width:1280px){
+            body{padding:30px;}
+            h1{font-size:2.8rem;}
+            .sub{font-size:1.2rem;}
+            .event-title{font-size:2.8rem;}
+            .event-desc{font-size:1.3rem;}
+            .channels-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:25px;}
+            .channel-card{padding:25px;}
+            .channel-card img{width:100px;height:100px;}
+            
+            /* টিভিতে অত্যন্ত বেশি হাইলাইট - দূর থেকে স্পষ্ট */
+            .channel-card:hover{
+                transform:scale(1.35) translateY(-15px);
+                box-shadow:0 35px 80px rgba(0,0,0,0.9), 0 0 100px rgba(255,215,0,0.6);
+                border-width:5px;
+            }
+            .channel-card:focus-visible{
+                transform:scale(1.35) translateY(-15px);
+                outline:8px solid #FFD700;
+                outline-offset:20px;
+                box-shadow:0 35px 80px rgba(0,0,0,0.9), 0 0 100px rgba(255,215,0,0.7);
+                border-width:5px;
+            }
+            .channel-card:hover .channel-name,
+            .channel-card:focus-visible .channel-name{
+                font-size:1.4rem;
+                text-shadow:0 0 40px rgba(255,215,0,0.5);
+            }
+            .channel-card:hover img,
+            .channel-card:focus-visible img{
+                transform:scale(1.2);
+                box-shadow:0 0 50px rgba(255,215,0,0.6);
+            }
+            .event-banner:hover{
+                transform:scale(1.12);
+                box-shadow:0 0 80px rgba(255,215,0,0.8), 0 15px 50px rgba(0,0,0,0.5);
+            }
+            .event-banner:focus-visible{
+                transform:scale(1.12);
+                outline:8px solid #FFD700;
+                outline-offset:10px;
+                box-shadow:0 0 80px rgba(255,215,0,0.8), 0 15px 50px rgba(0,0,0,0.5);
+            }
+            .cat-btn:hover{
+                transform:scale(1.18);
+                box-shadow:0 0 50px rgba(255,215,0,0.5);
+            }
+            .suggestion-card:hover{
+                transform:scale(1.22);
+                box-shadow:0 30px 70px rgba(0,0,0,0.7), 0 0 60px rgba(255,215,0,0.35);
+            }
+            .suggestion-card:focus-visible{
+                transform:scale(1.22);
+                outline:6px solid #FFD700;
+                outline-offset:8px;
+                box-shadow:0 30px 70px rgba(0,0,0,0.7), 0 0 60px rgba(255,215,0,0.45);
+            }
+        }
+        
+        /* ==================== ডেস্কটপ/ল্যাপটপ (মাঝারি হাইলাইট) ==================== */
+        @media (min-width:769px) and (max-width:1279px){
+            .channel-card:hover{
+                transform:scale(1.25) translateY(-10px);
+                box-shadow:0 25px 60px rgba(0,0,0,0.75), 0 0 60px rgba(255,215,0,0.35);
+            }
+            .channel-card:focus-visible{
+                transform:scale(1.25) translateY(-10px);
+                outline:6px solid #FFD700;
+                outline-offset:12px;
+                box-shadow:0 25px 60px rgba(0,0,0,0.75), 0 0 60px rgba(255,215,0,0.45);
+            }
+        }
+        
+        /* ==================== মোবাইল (সামান্য হাইলাইট - টাচ ডিভাইসের জন্য) ==================== */
+        @media (max-width:600px){
+            .channels-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;}
+            .channel-card{padding:12px;}
+            .channel-card img{width:60px;height:60px;}
+            .channel-name{font-size:0.75rem;}
+            .channel-card:hover{
+                transform:scale(1.08) translateY(-4px);
+                border-color:#FFD700;
+                box-shadow:0 12px 30px rgba(0,0,0,0.4), 0 0 25px rgba(255,215,0,0.2);
+            }
+            .channel-card:focus-visible{
+                transform:scale(1.08) translateY(-4px);
+                outline:4px solid #FFD700;
+                outline-offset:4px;
+                box-shadow:0 12px 30px rgba(0,0,0,0.4), 0 0 25px rgba(255,215,0,0.2);
+            }
+            .channel-card:hover .channel-name,
+            .channel-card:focus-visible .channel-name{
+                font-size:0.82rem;
+            }
+            .event-banner:hover{transform:scale(1.04);}
+            .event-title{font-size:1.3rem;}
+            .event-desc{font-size:0.9rem;}
+            .cat-btn{padding:6px 14px;font-size:0.8rem;}
+            .cat-btn:hover{transform:scale(1.06);}
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<div class="container">
+    <div id="homeMode" class="home-mode">
+        <h1>NEXORA TV</h1>
+        
+        <div class="event-banner" id="eventBanner" tabindex="0" role="button">
+            <div class="event-title" id="eventTitle">🏆 ফিফা বিশ্বকাপ ২০২৬ পরবর্তী ম্যাচ 🏆</div>
+            <div class="event-desc" id="eventDesc">Germany vs Ivory Coast ⏲️রাত ২ টা</div>
+            <div class="event-live">🔴 লাইভ</div>
+        </div>
+        
+        <div class="category-selector" id="categorySelector">
+            <button class="cat-btn active" data-category="all" tabindex="0">সব</button>
+            <button class="cat-btn" data-category="bangladeshi" tabindex="0">🇧🇩 বাংলাদেশি</button>
+            <button class="cat-btn" data-category="international" tabindex="0">🌍 আন্তর্জাতিক</button>
+            <button class="cat-btn" data-category="entertainment" tabindex="0">🎬 বিনোদন</button>
+            <button class="cat-btn" data-category="islamic" tabindex="0">🕌 ইসলামিক</button>
+            <button class="cat-btn" data-category="sports" tabindex="0">⚽ স্পোর্টস</button>
+            <button class="cat-btn" data-category="kids" tabindex="0">🧒 কিডস</button>
+        </div>
+        
+        <div class="channels-grid" id="channelsGrid"></div>
+    </div>
+    
+    <div id="playerMode" class="player-mode">
+        <div class="player-area">
+            <div class="player-header" id="nowPlaying">🎬 এখন চলছে:</div>
+            <div class="video-wrapper" id="videoWrapper">
+                <video id="mainVideo" controls autoplay playsinline></video>
+            </div>
+        </div>
+        <div class="suggestions-section">
+            <div class="suggestions-header">
+                <h3>🎯 <span>আরও দেখুন</span></h3>
+                <button class="home-back-btn" id="homeBackBtn" tabindex="0">🏠 হোমে ফিরুন</button>
+            </div>
+            <div class="suggestions-grid" id="suggestionsGrid"></div>
+        </div>
+    </div>
+    
+    <div class="ad-bottom" id="adContainer">
+        <script>
+            atOptions = {
+                'key' : '7bc66073f87704a3289310f1cc22aa75',
+                'format' : 'iframe',
+                'height' : 90,
+                'width' : 728,
+                'params' : {}
+            };
+        </script>
+        <script src="https://criminaldissolved.com/7bc66073f87704a3289310f1cc22aa75/invoke.js"></script>
+    </div>
+    
+    <footer>© NEXORA TV | সর্বস্বত্ব সংরক্ষিত | ওয়েব অ্যাপ</footer>
+</div>
+
+<script>
+// ==================== ফায়ারবেস কনফিগ ====================
+const firebaseConfig = {
+    apiKey: "AIzaSyAEEk8vw8QZElb9Nc9PJ2x3FrMrYTqzCx4",
+    authDomain: "nexora-tv-6cf6c.firebaseapp.com",
+    projectId: "nexora-tv-6cf6c",
+    storageBucket: "nexora-tv-6cf6c.firebasestorage.app",
+    messagingSenderId: "1013726917178",
+    appId: "1:1013726917178:web:7b91d3c5e4f021d03b7b03",
+    measurementId: "G-9P23RD578N"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ==================== ডিফল্ট চ্যানেল (ব্যাকআপ) ====================
+const DEFAULT_CHANNELS = [
+    { name: "বাংলা ভিশন", category: "bangladeshi", logo: "https://i.postimg.cc/bv644ctV/image-search-1781428911568.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1715/output/index.m3u8?channel=UCeYFskCmi5hxLpdtMvc2biA" },
+    { name: "বিটিভি", category: "bangladeshi", logo: "https://i.postimg.cc/PfLzWsrX/image-search-1781431014305.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1709/output/index.m3u8?channel=UCeYFskCmi5hxLpdtMvc2biA" },
+    { name: "চ্যানেল আই", category: "bangladeshi", logo: "https://i.postimg.cc/xCNJzQyj/channei-i-1781431299524.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1723/output/index.m3u8?channel=UC3e0B8b8n8jVpRz5c5qWzQQ" },
+    { name: "এনটিভি", category: "bangladeshi", logo: "https://i.postimg.cc/zX8vJKQQ/Ntv-1781431473080.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1716/output/index.m3u8?channel=UC2QrVkK2h0nVqL8LQjMjfMw" },
+    { name: "সময় টিভি", category: "sports", logo: "https://i.postimg.cc/s2cKNpt3/image-search-1781431994095.png", url: "https://live.thebosstv.com:30443/dwlive/Somoy-TV/chunks.m3u8" },
+    { name: "AlJazeera", category: "international", logo: "https://i.postimg.cc/3RHHzCD3/image-search-1781768308189.png", url: "https://live-hls-apps-aje-fa.getaj.net/AJE/03.m3u8" },
+    { name: "যমুনা টিভি", category: "bangladeshi", logo: "https://i.postimg.cc/LsCQstvL/image-search-1781432178851.jpg", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1701/output/index.m3u8?channel=UC6tBbLkP0DmHgHjCTQcBlqg" },
+    { name: "Gtv", category: "bangladeshi", logo: "https://i.postimg.cc/8ktczjVf/image-search-1781432683029.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1702/output/1702-audio_113322_eng=113200-video=2202800.m3u8" },
+    { name: "DBC NEWS", category: "bangladeshi", logo: "https://i.postimg.cc/TPLgrnfr/image-search-1781432354311.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1728/output/1728.m3u8?channel=UC6tBbLkP0DmHgHjCTQcBlqgi" },
+    { name: "একাত্তর টিভি", category: "bangladeshi", logo: "https://i.postimg.cc/yNyBpb1z/image-search-1781432802145.jpg", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1705/output/index.m3u8?channel=UC6tBbLkP0DmHgHjCTQcBlqlg" },
+    { name: "চ্যানেল 24", category: "bangladeshi", logo: "https://i.postimg.cc/Px77SWw5/image-search-1781432952696.webp", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1703/output/index.m3u8?channel=UC6tBbLkP0DmHgHjCTQcBlqig" },
+    { name: "ATN BANGLA", category: "bangladeshi", logo: "https://i.postimg.cc/t427YJ6S/image-search-1781433665815.png", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1706/output/index.m3u8?channel=UC6tBbLkP0DmHgHjCTQcBlo" },
+    { name: "SONY AATH", category: "entertainment", logo: "https://i.postimg.cc/pd3WFFL8/image-search-1781433808457.jpg", url: "https://www.youtube.com/embed/live_stream?channel=UC6tBbLkP0DmHgHjCTQcBlpqg" },
+    { name: "Colors Bangla", category: "entertainment", logo: "https://i.postimg.cc/SRDHcBGb/image-search-1781434025873.jpg", url: "https://www.youtube.com/embed/live_stream?channel=UC6tBbLkP0DmHgHjCTQcBluqg" },
+    { name: "Zee Bangla", category: "entertainment", logo: "https://i.postimg.cc/JnW0G2x9/image-search-1781435076449.png", url: "https://www.youtube.com/embed/live_stream?channel=UC6tBbLkP0DmHgHjCTQcBlqg" },
+    { name: "স্টার জলসা", category: "entertainment", logo: "https://i.postimg.cc/vHSmWBXt/image-search-1781435160862.jpg", url: "https://www.youtube.com/embed/live_stream?channel=UC6tBbLkP0DmHgHjCTQcBlqg" },
+    { name: "independent tv", category: "bangladeshi", logo: "https://i.postimg.cc/QMDZ5ZL5/image-search-1781435359605.jpg", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1704/output/index.m3u8?channel=UC6tBbLkP0DmHgHjCTQcBlqg" },
+    { name: "T Sports", category: "sports", logo: "https://i.postimg.cc/T2BdwSP5/image-search-1781435561691.webp", url: "https://mflixott.com/tv/dd/live.php?id=270&cid=270&srv=0&chunks=WwQjRglUGV4zIzkaBUARMFYDLDReAiRKXyYANX9FAhAbWhc7fHkFSQUcNi4RGFw_VRVifRQVAiZ4XH8MC086Uk9Tckc8PmUHEQQrGm8iKANEDTRTCx0OFHZQCAUfQQclc38CXkBXY35JXEk&vtoken=" },
+    { name: "ইসলামিক টিভি", category: "islamic", logo: "https://i.postimg.cc/BQBzRjk9/image-search-1781550082750.jpg", url: "https://app24.jagobd.com.bd/c3VydmVyX8RpbEU9Mi8xNy8yMFDEEHGcfRgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcEdsEfeDeKiNkVN3PTOmdFseWRtaW51aiPhnPTI2/islamictvbd.stream/tracks-v1a1/mono.m3u8" },
+    { name: "মাদানী টিভি বাংলা", category: "islamic", logo: "https://i.postimg.cc/6qQgVH7p/image-search-1781632307313.jpg", url: "https://streaming.madanichannel.tv/static/streaming-playlists/hls/d3e49b76-ac06-4689-a641-9200445b647f/0.m3u8" },
+    { name: "Peace Tv", category: "islamic", logo: "https://i.postimg.cc/6p13CSy3/image-search-1781632030247.jpg", url: "https://dzkyvlfyge.erbvr.com/PeaceTvBangla/tracks-v2a1/mono.m3u8" },
+    { name: "Discovery", category: "international", logo: "https://i.postimg.cc/662pNzjk/image-search-1781633243374.png", url: "https://vodzong.mjunoon.tv:8087/streamtest/Animal-Planet-158-3/playlist.m3u8" },
+    { name: "রাজধানী টিভি", category: "bangladeshi", logo: "https://i.postimg.cc/y8v86Yg1/image-search-1781550875331.jpg", url: "https://stream.shariarsuvo.com/hls6/rajdhaniweb.m3u8" },
+    { name: "দীপ্ত টিভি", category: "bangladeshi", logo: "https://i.postimg.cc/tRK6jsd3/image-search-1781433532430.jpg", url: "https://owrcovcrpy.gpcdn.net/bpk-tv/1711/output/index.m3u8" },
+    { name: "বাংলা কার্টুন", category: "kids", logo: "https://i.postimg.cc/sX3H4nBg/image-search-1781634494530.jpg", url: "https://server.zillarbarta.com/zbcatun/video.m3u8" },
+    { name: "গোপাল ভাঁড়", category: "kids", logo: "https://i.postimg.cc/8zvGh45H/image-search-1781707043564.jpg", url: "https://live20.bozztv.com/giatvplayout7/giatv-209611/tracks-v1a1/mono.ts.m3u8" },
+    { name: "G Series", category: "entertainment", logo: "https://i.postimg.cc/DyGQdcyF/image-search-1781767923662.png", url: "https://vods2.aynaott.com/gseriesDrama/tracks-v1a1/mono.ts.m3u8" },
+    { name: "Hindi Movies", category: "entertainment", logo: "https://i.postimg.cc/ZRJsXM0k/image-search-1781767798725.png", url: "https://vods2.aynaott.com/hindimovies/tracks-v1a1/mono.ts.m3u8" },
+    { name: "beiN Sports", category: "sports", logo: "https://i.postimg.cc/brmm71V4/image-search-1781869159161.png", url: "https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8" },
+    { name: "Fifa+En", category: "sports", logo: "https://i.postimg.cc/KcdyyjDV/image-search-1781811712214.jpg", url: "https://a62dad94.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X0ZJRkFQbHVzRW5nbGlzaF9ITFM/playlist.m3u8" },
+    { name: "SONY MOVIES", category: "entertainment", logo: "https://i.postimg.cc/2SP5cf03/image-search-1781946562984.png", url: "https://a-cdn.klowdtv.com/live1/smc_720p/chunks.m3u8" },
+    { name: "SRK TV", category: "entertainment", logo: "https://i.postimg.cc/k590X14W/image-search-1781946586959.jpg", url: "https://srknowapp.ncare.live/srktvhlswodrm/srktv.stream/tracks-v1a1/mono.m3u8" },
+    { name: "STAR Sports", category: "sports", logo: "https://i.postimg.cc/wT89Jkbp/image-search-1781945308841.png", url: "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8" },
+    { name: "FOX Sports FIFA", category: "sports", logo: "https://i.postimg.cc/6qhb8wm9/image-search-1781945455775.gif", url: "https://tv.beyondtaxconsultants.com/api/https?url=http://84.17.50.102/fox/index.m3u8" },
+    { name: "MAT4 TV", category: "sports", logo: "https://i.postimg.cc/s2RWNSXz/image-search-1781945671613.png", url: "https://bl.video.matchtv.ru/media/playlist/free_d46d0cf1712c0542ec7fd4f0808f600a_hd/17_89756005/1080/e6bef86de8a133cd7b27deb040758a00/4796141934.m3u8" },
+    { name: "Cc Tv world cup", category: "sports", logo: "https://i.postimg.cc/ydDSJTpS/image-search-1781945884567.png", url: "https://live.wxinxi.com/live/25816724_sb2maw7iluj1ghr92sk5siud28tpimx0.m3u8" },
+    { name: "MEGoGo", category: "sports", logo: "https://i.postimg.cc/FKjBMjVY/image-search-1781946215750.png", url: "https://tv.beyondtaxconsultants.com/api/proxy?url=http://471ccec7.tvclub.xyz/iptv/BUYS9YTNABMC25/31612/index.m3u8" },
+    { name: "TVP SPORT", category: "sports", logo: "https://i.postimg.cc/sgCPtb68/image-search-1781946319611.png", url: "https://1nyaler.streamhostingcdn.top/stream/89/index.m3u8" },
+    { name: "WIN Sports", category: "sports", logo: "https://i.postimg.cc/43d15V28/image-search-1781946439956.jpg", url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8" }
+];
+
+// ==================== গ্লোবাল ভেরিয়েবল ====================
+let channelsData = DEFAULT_CHANNELS;
+let currentCategory = "all";
+let currentHls = null;
+let currentChannel = null;
+let eventData = { title: "🏆 ফিফা বিশ্বকাপ ২০২৬ পরবর্তী ম্যাচ 🏆", desc: "Germany vs Ivory Coast ⏲️রাত ২ টা", url: "https://live.wxinxi.com/live/25816724_sb2maw7iluj1ghr92sk5siud28tpimx0.m3u8" };
+
+const homeMode = document.getElementById("homeMode");
+const playerMode = document.getElementById("playerMode");
+const channelsGrid = document.getElementById("channelsGrid");
+const nowPlaying = document.getElementById("nowPlaying");
+const suggestionsGrid = document.getElementById("suggestionsGrid");
+const videoWrapper = document.getElementById("videoWrapper");
+const homeBackBtn = document.getElementById("homeBackBtn");
+const eventBanner = document.getElementById("eventBanner");
+const eventTitle = document.getElementById("eventTitle");
+const eventDesc = document.getElementById("eventDesc");
+
+function getVideo() { return document.getElementById('mainVideo'); }
+
+// ==================== ফায়ারবেস লিসেনার ====================
+db.collection("nexora").doc("appData").onSnapshot((doc) => {
+    if (doc.exists) {
+        const data = doc.data();
+        console.log("📦 ইউজার: ডাটা এলো", data);
+        if (data.channels && data.channels.length > 0) {
+            channelsData = data.channels;
+            renderChannels(currentCategory);
+        } else {
+            channelsData = DEFAULT_CHANNELS;
+            renderChannels(currentCategory);
+        }
+        if (data.event) {
+            eventData = data.event;
+            eventTitle.textContent = eventData.title;
+            eventDesc.textContent = eventData.desc;
+        }
+    } else {
+        channelsData = DEFAULT_CHANNELS;
+        renderChannels(currentCategory);
+    }
+});
+
+// ==================== ভিজিট ট্র্যাকিং ====================
+function trackVisit() {
+    if (!sessionStorage.getItem("nexora_visited_today")) {
+        const todayStr = new Date().toDateString();
+        const statsRef = db.collection("nexora_stats").doc("visits");
+        db.runTransaction((transaction) => {
+            return transaction.get(statsRef).then((sfDoc) => {
+                if (!sfDoc.exists) {
+                    transaction.set(statsRef, { total: 1, daily: { [todayStr]: 1 } });
+                } else {
+                    const data = sfDoc.data();
+                    const dailyObj = data.daily || {};
+                    dailyObj[todayStr] = (dailyObj[todayStr] || 0) + 1;
+                    transaction.update(statsRef, { total: firebase.firestore.FieldValue.increment(1), daily: dailyObj });
+                }
+            });
+        }).then(() => {
+            sessionStorage.setItem("nexora_visited_today", "true");
+        }).catch(err => console.log("ভিজিট ট্র্যাকিং ব্যর্থ:", err));
+    }
+}
+
+function filterChannels(category) {
+    currentCategory = category;
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.category === category);
+    });
+    renderChannels(category);
+}
+
+function renderChannels(category) {
+    const filtered = (category === "all") ? channelsData : channelsData.filter(ch => ch.category === category);
+    channelsGrid.innerHTML = "";
+    if (filtered.length === 0) {
+        channelsGrid.innerHTML = `<div style="text-align:center; color:#FFD700; padding:40px; grid-column:1/-1;">এই ক্যাটাগরিতে কোনো চ্যানেল নেই</div>`;
+        return;
+    }
+    filtered.forEach(ch => {
+        const card = document.createElement("div");
+        card.className = "channel-card";
+        card.setAttribute("tabindex", "0");
+        card.innerHTML = `
+            <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/70'">
+            <div class="channel-name">${ch.name}</div>
+            <div class="channel-category">${getCategoryLabel(ch.category)}</div>
+            <div class="live-badge">লাইভ</div>
+        `;
+        card.onclick = () => playChannel(ch);
+        card.onkeydown = (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                playChannel(ch);
+            }
+        };
+        channelsGrid.appendChild(card);
+    });
+}
+
+function getCategoryLabel(cat) {
+    const labels = { 'bangladeshi': 'বাংলাদেশি', 'international': 'আন্তর্জাতিক', 'entertainment': 'বিনোদন', 'islamic': 'ইসলামিক', 'sports': 'স্পোর্টস', 'kids': 'কিডস' };
+    return labels[cat] || cat;
+}
+
+eventBanner.onclick = () => {
+    playChannel({ name: eventData.title, logo: "https://via.placeholder.com/70", category: "event", url: eventData.url });
+    setTimeout(() => {
+        const v = getVideo();
+        if (v && v.requestFullscreen) v.requestFullscreen();
+    }, 1500);
+};
+eventBanner.onkeydown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        eventBanner.onclick();
+    }
+};
+
+function fullCleanup() {
+    if (currentHls) { try { currentHls.destroy(); } catch(e) {} currentHls = null; }
+    const v = getVideo();
+    if (v) { try { v.pause(); v.removeAttribute('src'); v.load(); } catch(e) {} }
+    videoWrapper.innerHTML = '';
+    const newVideo = document.createElement('video');
+    newVideo.id = 'mainVideo';
+    newVideo.controls = true; newVideo.autoplay = true; newVideo.playsinline = true;
+    newVideo.style.cssText = 'width:100%;height:100%;background:#000;outline:none;display:block;object-fit:contain;';
+    videoWrapper.appendChild(newVideo);
+}
+
+function playChannel(channel) {
+    fullCleanup();
+    const video = getVideo();
+    currentChannel = channel;
+    homeMode.style.display = "none";
+    playerMode.style.display = "block";
+    nowPlaying.innerHTML = `🎬 এখন চলছে: ${channel.name}`;
+    
+    if (channel.url.includes('youtube.com/embed')) {
+        videoWrapper.innerHTML = `<iframe src="${channel.url}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>`;
+        showSuggestions();
+        return;
+    }
+    
+    videoWrapper.innerHTML = `<div class="loading-text">⏳ লোড হচ্ছে...</div>`;
+    let loadingTimeout = setTimeout(() => {
+        videoWrapper.innerHTML = `<div class="error-text">❌ লোড করতে সমস্যা<br><small>আবার চেষ্টা করুন</small></div>`;
+    }, 15000);
+    
+    if (Hls.isSupported()) {
+        currentHls = new Hls();
+        currentHls.loadSource(channel.url);
+        currentHls.attachMedia(video);
+        currentHls.on(Hls.Events.MANIFEST_PARSED, () => {
+            clearTimeout(loadingTimeout);
+            video.play();
+            videoWrapper.innerHTML = '';
+            videoWrapper.appendChild(video);
+        });
+        currentHls.on(Hls.Events.ERROR, (event, data) => {
+            if (data.fatal) {
+                clearTimeout(loadingTimeout);
+                videoWrapper.innerHTML = `<div class="error-text">❌ স্ট্রিম খুঁজে পাওয়া যায়নি</div>`;
+            }
+        });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = channel.url;
+        video.addEventListener('loadedmetadata', () => {
+            clearTimeout(loadingTimeout);
+            video.play();
+        });
+    }
+    showSuggestions();
+}
+
+function showSuggestions() {
+    if (!currentChannel || channelsData.length === 0) return;
+    const others = channelsData.filter(ch => ch.name !== currentChannel.name);
+    const shuffled = [...others].sort(() => 0.5 - Math.random()).slice(0, 6);
+    suggestionsGrid.innerHTML = shuffled.map(sugg => `
+        <div class="suggestion-card" tabindex="0" onclick='playChannel(${JSON.stringify(sugg)})' onkeydown='if(event.key==="Enter"||event.key===" "){event.preventDefault();playChannel(${JSON.stringify(sugg)})}'>
+            <img src="${sugg.logo}" onerror="this.src='https://via.placeholder.com/60'">
+            <div class="suggestion-name">${sugg.name}</div>
+            <div class="live-badge-small">লাইভ</div>
+        </div>
+    `).join('');
+}
+
+homeBackBtn.onclick = () => {
+    if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+    homeMode.style.display = "block";
+    playerMode.style.display = "none";
+    fullCleanup();
+    currentChannel = null;
+    renderChannels(currentCategory);
+};
+homeBackBtn.onkeydown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        homeBackBtn.onclick();
+    }
+};
+
+document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => filterChannels(btn.dataset.category));
+    btn.addEventListener('keydown', (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            filterChannels(btn.dataset.category);
+        }
+    });
+});
+
+window.onload = () => {
+    renderChannels("all");
+    trackVisit();
+};
+</script>
+</body>
+              </html>
