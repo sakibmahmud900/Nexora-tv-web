@@ -823,7 +823,7 @@ function loadVideo(url, title, isEvent = false) {
     });
     video.addEventListener('error', function(e) {
         clearTimeout(loadingTimeout);
-        videoWrapper.innerHTML = `<div class="error-text">❌ ভিডিও লোড করা সম্ভব হয়নি<br><small>URL চেক করে আবার চেষ্টা করুন</small></div>`;
+        videoWrapper.innerHTML = `<div class="error-text">❌ ভিডিও লোড করা সম্ভব হয়নি<br><small> app এ চেষ্টা করুন</small></div>`;
     });
 }
 
